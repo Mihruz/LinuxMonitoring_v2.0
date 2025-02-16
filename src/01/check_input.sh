@@ -1,25 +1,37 @@
 #!/bin/bash
 
-function isDigit {
-    [[ $1 =~ ^[0-9]+$ ]]
-}
-function dirName {
-    [[ $1 =~ ^[a-zA-Z]{1,7}$ ]]
-}
-function fileName {
-    [[ $1 =~ ^[a-zA-Z]{1,7}\.[a-zA-Z]{1,3}$ ]]
-}
-function size {
-    [[ ${1%kb} -le 100  && $1 =~ ^[0-9]{1,3}kb$ ]]
-}
+validate_input() {
+    local base_path="$1"
+    local num_folders="$2"
+    local folder_chars="$3"
+    local num_files="$4"
+    local file_chars="$5"
+    local file_size="$6"
 
-if [ ! -d $1 ]; then
-    mkdir $1 2>> error.log
-fi    
+    if [[ ! "$num_folders" =~ ^[0-9]+$ || "$num_folders" -le 0 ]]; then
+        echo "ERROR: Parameter 2 must be a positive integer."
+        return 1
+    fi
 
-if [ -d $1 ] && isDigit $2 && dirName $3 && isDigit $4 && fileName $5 && size $6; then
-    echo "Correct arguments. Running..."
-else
-    echo "ERROR: Input is not correct"
-    exit 1
-fi
+    if [[ ! "$folder_chars" =~ ^[a-zA-Z]{1,7}$ ]]; then
+        echo "ERROR: Parameter 3 must contain 1-7 English alphabet letters."
+        return 1
+    fi
+
+    if [[ ! "$num_files" =~ ^[0-9]+$ || "$num_files" -le 0 ]]; then
+        echo "ERROR: Parameter 4 must be a positive integer."
+        return 1
+    fi
+
+    if [[ ! "$file_chars" =~ ^[a-zA-Z]{1,7}\.[a-zA-Z]{1,3}$ ]]; then
+        echo "ERROR: Parameter 5 must contain 1-7 letters for the name and 1-3 letters for the extension."
+        return 1
+    fi
+
+    if [[ ! "$file_size" =~ ^[0-9]+kb$ || "${file_size%kb}" -gt 100 ]]; then
+        echo "ERROR: Parameter 6 must be in the format 'Xkb' where X is a number <= 100."
+        return 1
+    fi
+
+    return 0
+}
