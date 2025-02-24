@@ -2,7 +2,6 @@
 
 source "analyze.sh"
 
-# Проверка количества аргументов
 if [[ $# -ne 1 || ! $1 =~ ^[1-4]$ ]]; then
     echo "Использование: $0 {1|2|3|4}"
     echo "1 - Все записи, отсортированные по коду ответа"
@@ -11,26 +10,22 @@ if [[ $# -ne 1 || ! $1 =~ ^[1-4]$ ]]; then
     echo "4 - Все уникальные IP, которые встречаются среди ошибочных запросов"
     exit 1
 fi
-> result.log
-# Файл с логами (замените на путь к вашему файлу)
+
 LOG_FILE="*.log"
 
-# Обработка в зависимости от параметра
 case $1 in
     1)
-        # Все записи, отсортированные по коду ответа
-        cat $LOG_FILE | awk '{print}' | sort -k9,9n > result.log
+        sort_by_status "$LOG_FILE" > result.log
         ;;
     2)
-        # Все уникальные IP, встречающиеся в записях
-        cat $LOG_FILE | awk '{print $1}' | sort | uniq > result.log
+        unique_ips "$LOG_FILE" > result.log
         ;;
     3)
-        # Все запросы с ошибками (код ответа — 4xx или 5xx)
-        cat $LOG_FILE | awk '($9 >= 400 && $9 < 600) {print}'|uniq > result.log
+        error_requests "$LOG_FILE" > result.log
         ;;
     4)
-        # Все уникальные IP, которые встречаются среди ошибочных запросов
-        cat $LOG_FILE | awk '($9 >= 400 && $9 < 600)' | awk '{print $1}' | sort | uniq > result.log
+        error_ips "$LOG_FILE" > result.log
         ;;
 esac
+
+echo "Результат сохранен в файл: result.log"
