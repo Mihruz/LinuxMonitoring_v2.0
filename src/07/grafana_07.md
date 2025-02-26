@@ -19,7 +19,7 @@
 
 `cd node_exporter-1.6.1.linux-amd64`
 
-`./node_exporter`
+`node_exporter`
 
 `wget https://dl.grafana.com/enterprise/release/grafana-enterprise_11.5.2_amd64.deb`
 
